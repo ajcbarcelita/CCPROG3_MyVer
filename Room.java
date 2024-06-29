@@ -1,6 +1,6 @@
 import java.util.*;
-import java.lang.*;
 
+//Room class -to be changed
 public class Room {
     private String roomName;
     private double roomPrice;
@@ -8,9 +8,10 @@ public class Room {
     private ArrayList<Reservation> reservationList;
 
     public Room (double roomPrice, Hotel hotel) {
-        this.roomName = generateRoomName(hotel);
+        this.roomName = generateRoomName(hotel).trim();
         this.roomPrice = roomPrice;
         this.hotel = hotel;
+        this.reservationList = new ArrayList<Reservation>();
     }
 
     private String generateRoomName(Hotel hotel) {
@@ -37,5 +38,9 @@ public class Room {
 
     public ArrayList<Reservation> getReservationList() {
         return this.reservationList;
+    }
+
+    public void addReservation(Reservation reservation) {
+        this.reservationList.add(reservation);
     }
 }

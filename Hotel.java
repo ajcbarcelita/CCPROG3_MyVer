@@ -1,5 +1,4 @@
-import java.util.*; //for arraylist and Scanner
-import java.lang.*; //for string
+import java.util.*; //for arraylist
 
 public class Hotel {
     private String hotelName;
@@ -9,14 +8,14 @@ public class Hotel {
 
     //constructors
     public Hotel(String hotelName) { //using default base price
-        this.hotelName = hotelName;
+        this.hotelName = hotelName.trim();
         this.roomList = new ArrayList<Room>();
         this.reservationList = new ArrayList<Reservation>();
         this.basePrice = 1299.00;
     }
 
     public Hotel(String hotelName, double basePrice) {
-        this.hotelName = hotelName;
+        this.hotelName = hotelName.trim();
         this.roomList = new ArrayList<Room>();
         this.reservationList = new ArrayList<Reservation>();
         this.basePrice = basePrice;
@@ -53,7 +52,7 @@ public class Hotel {
 
     //room methods
     public boolean createAndAddRoom(double roomPrice) {
-        if (this.roomList.size() > 50) {
+        if (this.roomList.size() >= 50) {
             System.out.printf("The hotel %s has already reached the maximum number of rooms allowed.\n", this.hotelName);
             return false;
         }
@@ -78,19 +77,35 @@ public class Hotel {
     }
 
     public boolean removeRoom(Room hotelRoom) {
-        if (this.roomList.contains(hotelRoom) && hotelRoom.getReservationList().isEmpty()) {
-            this.roomList.remove(hotelRoom);
-            return true;
-        } else if (this.roomList.contains(hotelRoom) && !hotelRoom.getReservationList().isEmpty()) {
-            System.out.printf("The room %s has existing reservations and cannot be removed.\n", hotelRoom.getRoomName());
-            return false;
+        // Check if the room exists in the hotel
+        if (this.roomList.contains(hotelRoom)) {
+            // Check if the reservation list is not null and not empty
+            if (hotelRoom.getReservationList() != null && !hotelRoom.getReservationList().isEmpty()) {
+                System.out.printf("The room %s has existing reservations and cannot be removed.\n", hotelRoom.getRoomName());
+                return false;
+            } else {
+                // Proceed to remove the room as it has no reservations or the list is null
+                this.roomList.remove(hotelRoom);
+                return true;
+            }
         } else {
+            // Room does not exist in the hotel
             System.out.printf("The room %s does not exist in this hotel %s.\n", hotelRoom.getRoomName(), this.hotelName);
             System.out.println("Please check the room name and try again.");
             return false;
         }
     }
 
+    public Room findRoomByName(String roomName) {
+        for (Room hotelRoom: this.getRoomList()) {
+            if (hotelRoom.getRoomName().equalsIgnoreCase(roomName.trim())) {
+                return hotelRoom;
+            }
+        }
+        return null;
+    }
+
+    //change hotel attribute methods
     public boolean updateRoomRate(double newRate) {
         if (this.reservationList.isEmpty()) {
             if (newRate >= 100.0) {
@@ -109,5 +124,41 @@ public class Hotel {
         }
     }
 
+    //display methods
+    public void displayAllRooms() {
+        ArrayList<Room> roomList = getRoomList();
 
+        if (roomList.isEmpty()) {
+            System.out.printf("There are no rooms in hotel %s.\n", this.hotelName);
+        } else {
+            System.out.printf("Hotel %s has the following rooms:\n", this.hotelName);
+            for (Room hotelRoom: roomList) {
+                System.out.printf("%s: PHP%.2f\n", hotelRoom.getRoomName(), hotelRoom.getRoomPrice());
+            }
+        }
+    }
+
+    //reservation methods
+    public void addReservation(Reservation newReservation) {
+        this.reservationList.add(newReservation);
+    }
+
+    public double calculateMonthlyEarnings() {
+        double monthlyEarnings = 0.0;
+        for (Reservation hotelReservation: this.reservationList) {
+            monthlyEarnings += hotelReservation.getTotalPrice();
+        }
+        return monthlyEarnings;
+    }
+
+    public void displayReservationIDs() {
+        if (this.reservationList.isEmpty()) {
+            System.out.printf("There are no reservations in hotel %s.\n", this.hotelName);
+        } else {
+            System.out.printf("Hotel %s has the following reservations:\n", this.hotelName);
+            for (Reservation hotelReservation: this.reservationList) {
+                System.out.printf("Reservation ID: %s\t Room Booked: %s\n", hotelReservation.getReservationID(), hotelReservation.getRoomBooked().getRoomName());
+            }
+        }
+    }
 }
